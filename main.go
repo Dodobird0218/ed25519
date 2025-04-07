@@ -8,7 +8,7 @@ import (
 	"ed25519/signature"
 )
 
-// 模拟区块链交易结构
+// Simulated blockchain transaction structure
 type Transaction struct {
 	Sender    string
 	Receiver  string
@@ -16,25 +16,25 @@ type Transaction struct {
 	Timestamp int64
 }
 
-// 将交易结构转换为字节数组用于签名
+// Convert transaction structure to byte array for signing
 func (tx *Transaction) ToBytes() []byte {
-	// 实际应用中应使用更规范的序列化方法，如Protobuf或JSON
+	// In a real application, a more standardized serialization method should be used, such as Protobuf or JSON
 	data := fmt.Sprintf("%s-%s-%.2f-%d", tx.Sender, tx.Receiver, tx.Amount, tx.Timestamp)
 	return []byte(data)
 }
 
 func main() {
-	// 生成一对新的密钥
+	// Generate a new key pair
 	keyPair, err := signature.GenerateKeyPair()
 	if err != nil {
-		log.Fatalf("生成密钥对失败: %v", err)
+		log.Fatalf("Failed to generate key pair: %v", err)
 	}
 
-	// 打印密钥信息
-	fmt.Printf("生成的公钥: %s\n", hex.EncodeToString(keyPair.PublicKey))
-	fmt.Printf("生成的私钥: %s\n\n", hex.EncodeToString(keyPair.PrivateKey))
+	// Print key information
+	fmt.Printf("Generated public key: %s\n", hex.EncodeToString(keyPair.PublicKey))
+	fmt.Printf("Generated private key: %s\n\n", hex.EncodeToString(keyPair.PrivateKey))
 
-	// 创建一个模拟的区块链交易
+	// Create a simulated blockchain transaction
 	transaction := &Transaction{
 		Sender:    "Alice",
 		Receiver:  "Bob",
@@ -42,32 +42,32 @@ func main() {
 		Timestamp: 1680153600,
 	}
 
-	// 获取交易数据并签名
+	// Get transaction data and sign it
 	txData := transaction.ToBytes()
 	signature, err := keyPair.Sign(txData)
 	if err != nil {
-		log.Fatalf("签名交易失败: %v", err)
+		log.Fatalf("Failed to sign transaction: %v", err)
 	}
 
-	fmt.Printf("交易数据: %s\n", string(txData))
-	fmt.Printf("签名: %s\n\n", hex.EncodeToString(signature))
+	fmt.Printf("Transaction data: %s\n", string(txData))
+	fmt.Printf("Signature: %s\n\n", hex.EncodeToString(signature))
 
-	// 验证签名
+	// Verify the signature
 	isValid := keyPair.Verify(txData, signature)
-	fmt.Printf("签名验证结果: %v\n", isValid)
+	fmt.Printf("Signature verification result: %v\n", isValid)
 
-	// 模拟篡改交易数据
+	// Simulate tampering with the transaction data
 	tamperedTransaction := &Transaction{
 		Sender:    "Alice",
 		Receiver:  "Bob",
-		Amount:    10.5, // 改变金额
+		Amount:    10.5, // Change amount
 		Timestamp: 1680153600,
 	}
 
 	tamperedTxData := tamperedTransaction.ToBytes()
-	fmt.Printf("\n篡改后的交易数据: %s\n", string(tamperedTxData))
+	fmt.Printf("\nTampered transaction data: %s\n", string(tamperedTxData))
 
-	// 验证篡改后的交易
+	// Verify the tampered transaction
 	isValidTampered := keyPair.Verify(tamperedTxData, signature)
-	fmt.Printf("篡改后的交易验证结果: %v\n", isValidTampered)
+	fmt.Printf("Tampered transaction verification result: %v\n", isValidTampered)
 }
